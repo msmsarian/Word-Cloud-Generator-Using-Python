@@ -43,4 +43,47 @@ for tweet in posts[0:200]:
 # Create a dataframe with a column called Tweets
 df = pd.DataFrame ( [tweet.full_text for tweet in posts] , columns=['Tweets'])
 
-df.head()  
+df.head()
+
+#Clean the Text
+
+#Create a function to clean the tweets
+def cleanTxt(text):
+    text = re.sub(r'@[A-Za-z0-9]+', '', text) # Remove @mentions
+    text = re.sub(r'#', '', text) # Remove the '#' symbol
+    text = re.sub(r'RT[\s]+', '', text) # Remove RT
+    text = re.sub(r'https?:\/\/\S+', '', text) # Remove the Hyper Link
+
+    return text
+
+# Cleaning the text
+
+df['Tweets']= df['Tweets'].apply(cleanTxt)
+
+#Show the cleaned text
+df
+
+# Create a function to get the subjectivity
+def getSubjectivity(text):
+    return TextBlob(text).sentiment.subjectivity
+
+# Get polarity
+
+def getPolarity(text):
+    return TextBlob(text).sentiment.polarity
+
+# Create two new columns
+
+df['Subjectivity'] = df['Tweets'].apply(getSubjectivity)
+df['Polarity'] = df['Tweets'].apply(getPolarity)
+
+# Show the new dataframe with the new columns
+df
+
+# Word Cloud
+allWords = ' '.join( [twts for twts in df['Tweets']])
+wordCloud = WordCloud(width = 500, height = 300, random_state = 21, max_font_size = 119).generate(allWords)
+
+plt.imshow(wordCloud, interpolation = "bilinear")
+plt.axis('off')
+plt.show()  
